@@ -5,6 +5,10 @@ from rest_framework import generics
 
 from .models import Producto, SubCategoria, Categoria
 from .serializers import ProductoSerializer, CategoriaSerializer, SubCategoriaSerializer
+from rest_framework.views import APIView
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework import viewsets
 
 
 """ class ProductoList(APIView):
@@ -47,10 +51,35 @@ class CategoriaList(generics.ListCreateAPIView):
     serializer_class = CategoriaSerializer
 
 
+# class SubCategoriaList(generics.ListCreateAPIView):
+#     queryset = SubCategoria.objects.all()
+#     serializer_class = SubCategoriaSerializer    
+
 class SubCategoriaList(generics.ListCreateAPIView):
-    queryset = SubCategoria.objects.all()
-    serializer_class = SubCategoriaSerializer    
+    # Filtrar subcategorias que pertenezcan a una categoria 
+    def get_queryset(self):
+        queryset = SubCategoria.objects.filter(categoria_id = self.kwargs["pk"]) #self.kwargs["pk"] : Lo que este en pk
+        return queryset
+    serializer_class = SubCategoriaSerializer 
 
 
+class CategoriaDetalle(generics.RetrieveDestroyAPIView):
+    queryset = Categoria.objects.all()
+    serializer_class = CategoriaSerializer
 
+class SubCategoriaAdd(APIView):
+    def post(self, request, cat_pk): #Sobrescribir el método post
+        descripcion = request.data.get("descripcion")
+        data = {"categoria": cat_pk, "descripcion":descripcion}
+        serializer = SubCategoriaSerializer(data=data)
+        if serializer.is_valid():
+            subcat = serializer.save()
+            return Response(serializer.data, status = status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) #Imprimo los errores y devuelvo el status    
+
+#Ya el ViewSet me da los métodos POST, DELETE, PUT, GET, etc.
+class ProductoViewSet(viewsets.ModelViewSet):
+    queryset = Producto.objects.all()
+    serializer_class = ProductoSerializer
 
