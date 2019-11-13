@@ -4,11 +4,12 @@
 from rest_framework import generics
 
 from .models import Producto, SubCategoria, Categoria
-from .serializers import ProductoSerializer, CategoriaSerializer, SubCategoriaSerializer
+from .serializers import ProductoSerializer, CategoriaSerializer, SubCategoriaSerializer, UserSerializer
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework import viewsets
+from django.contrib.auth import authenticate
 
 
 """ class ProductoList(APIView):
@@ -82,4 +83,26 @@ class SubCategoriaAdd(APIView):
 class ProductoViewSet(viewsets.ModelViewSet):
     queryset = Producto.objects.all()
     serializer_class = ProductoSerializer
+
+
+
+class UserCreate(generics.CreateAPIView):
+    authentication_classes = () #Invalido IsAuthenticaded de settings para esta clase, inválido la configuración global de autenticación que es REST_FRAMEWORK de settings
+    permission_classes = ()
+    serializer_class = UserSerializer
+
+class LoginView(APIView):
+    permission_classes = () #No tome la configuración global para la autorización
+
+    def post(self,request):
+        username = request.data.get("username")
+        password = request.data.get("password")
+        user = authenticate(username=username, password=password) #Verificar si la utenticación es correcta
+        if user:
+            return Response({"token":user.auth_token.key})
+        else:
+            return Response({"error": "Credenciales incorrecta"}, status=status.HTTP_400_BAD_REQUEST)    
+
+
+
 
