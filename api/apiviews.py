@@ -12,6 +12,7 @@ from rest_framework import viewsets
 from django.contrib.auth import authenticate
 
 from .permission import IsOwner
+from rest_framework.permissions import IsAuthenticated
 
 """ class ProductoList(APIView):
     def get(self, request):
@@ -89,15 +90,14 @@ class SubCategoriaAdd(APIView):
             # Imprimo los errores y devuelvo el status
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 # Ya el ViewSet me da los métodos POST, DELETE, PUT, GET, etc.
-
-
 class ProductoViewSet(viewsets.ModelViewSet):
     queryset = Producto.objects.all()
     serializer_class = ProductoSerializer
 
-    #Personalizar los permisos
-    permission_class = [IsOwner] #Evaluar si es propietario
+    # Personalizar los permisos
+    permission_classes = ([IsAuthenticated,IsOwner])  # Evaluar si está autenticado y después si es propietario
 
 
 class UserCreate(generics.CreateAPIView):
