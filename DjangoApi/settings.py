@@ -130,8 +130,9 @@ STATIC_URL = '/static/'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.TokenAuthentication',
+        # 'rest_framework.authentication.TokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication', #Para uso de jwt
     ),
     #Los permisos son para los usuarios autenticados
     'DEFAULT_PERMISSION_CLASSES': (
